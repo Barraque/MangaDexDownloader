@@ -19,9 +19,8 @@ for line in webpage.splitlines():
                if(jason['lang_code'] != 'gb'):
                    continue
                chapter = jason['chapter']
-               dirName = mangaName +"_chapter_"+ chapter 
-               if not os.path.exists(mangaName + "/"+ dirName):
-                    os.makedirs(mangaName + "/" + dirName)
+               if not os.path.exists(mangaName + "/chapter_" + chapter):
+                    os.makedirs(mangaName + "/chapter_" + chapter)
                url = jason['server'] + jason['hash'] 
                index = 0
                print("Saving chapter " + chapter + " of " + mangaName);
@@ -29,6 +28,6 @@ for line in webpage.splitlines():
                    print(url + "/" + file)
                    r = requests.get( url + "/" + file)
                    r.raw.decode_content = True
-                   with open(mangaName + "/" + dirName + "/" + file, 'wb') as f:
+                   with open(mangaName + "/chapter_" + chapter + "/" + file, 'wb') as f:
                        f.write(r.content)
 
