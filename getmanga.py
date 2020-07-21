@@ -16,6 +16,8 @@ for line in webpage.splitlines():
             for id in listid.splitlines():
                r = requests.get("https://mangadex.org/api/?id=" + id  +"&server=null&saver=1&type=chapter", None)
                jason = json.loads(r.text)
+               if(jason['lang_code'] != 'gb'):
+                   continue
                chapter = jason['chapter']
                if not os.path.exists(mangaName + "/" + chapter):
                     os.makedirs(mangaName + "/" + chapter)
