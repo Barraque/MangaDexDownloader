@@ -69,14 +69,9 @@ def doDownload(line,lastChapter, begin, end):
             result2 = p.search(result)
             actualChapter = result2.group(1)
             volume = '0'
-        print("actual chapter = " + str(actualChapter), "begin =" + str(begin), "end =" + str( end))
-        print((begin is None and lastChapter != None and int(actualChapter) < int(lastChapter)))
-        print((begin is not None and begin > int(actualChapter) ))
         if((begin is None and lastChapter != None and int(actualChapter) < int(lastChapter)) or (begin is not None and begin > int(actualChapter) )):
-            print("Skipping " + volume + "." + actualChapter)
             raise SkipChapter()
         if (end and int(actualChapter) > end):
-            print("Stop at " + volume + "." + actualChapter)
             raise StopHere()
         listId = line.split("'")[1].split("/")[2]
         fileChapter.seek(0)
