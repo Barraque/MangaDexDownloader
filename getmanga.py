@@ -88,7 +88,7 @@ def getListId(webpageHtml, begin , end, languageRequire):
             else:
                 listChapter.append(chapter)
                 listId.append(href)
-        getFromApi(listId)
+    getFromApi(listId)
 
 fid=urllib.request.urlopen('https://mangadex.org/manga/' + str(opts.id))
 webpage=fid.read().decode('utf-8')
