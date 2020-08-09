@@ -8,11 +8,16 @@ import urllib.request
 class SkipChapter(Exception): pass
 class StopHere(Exception): pass
 
+def show_language(option, opt, value, parser):
+    print("Here the list of the language handle by the MangaDex website: \nArabic\nBengali\nBulgarian\nBurmese\nCatalan\nChinese (Simp)\nChinese (Trad)\nCzech\nDanish\nDutch\nEnglish\nFilipino\nFinnish\nFrench\nGerman\nGreek\nHebrew\nHindi\nHungarian\nIndonesian\nItalian\nJapanese\nKorean\nLithuanian\nMalay\nMongolian\nNorwegian\nOther\nPersian\nPolish\nPortuguese (Br)\nPortuguese (Pt)\nRomanian\nRussian\nSerbo-Croatian\nSpanish (Es)\nSpanish (LATAM)\nSwedish\nThai\nTurkish\nUkrainian\nVietnamese\nOther")
+    exit(0)
+
 parser = OptionParser()
 parser.add_option("-i","--id",type="int", help="the id of the mangaDex manga")
 parser.add_option("-b","--range_min",type="int", help="Begining of the chapter to download (an int)")
 parser.add_option("-e","--range_max",type="int", help="End of the chapter to download (an int)")
 parser.add_option("-l","--language", help="language of the scan", type="choice", choices=["Arabic","Bengali","Bulgarian","Burmese","Catalan","Chinese (Simp)","Chinese (Trad)","Czech","Danish","Dutch","English","Filipino","Finnish","French","German","Greek","Hebrew","Hindi","Hungarian","Indonesian","Italian","Japanese","Korean","Lithuanian","Malay","Mongolian","Norwegian","Other","Persian","Polish","Portuguese (Br)","Portuguese (Pt)","Romanian","Russian","Serbo-Croatian","Spanish (Es)","Spanish (LATAM)","Swedish","Thai","Turkish","Ukrainian","Vietnamese","Other"])
+parser.add_option("-L","--show_language",action="callback", callback=show_language, help="show the list of languages that works on MangaDex")
 
 (opts, args) = parser.parse_args()
 
