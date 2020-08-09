@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import requests ,json, sys, re, os, shutil
 from bs4 import BeautifulSoup
 from optparse import OptionParser
