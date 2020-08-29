@@ -21,18 +21,8 @@ parser.add_option("-L","--show_language",action="callback", callback=show_langua
 
 (opts, args) = parser.parse_args()
 
-if(opts.id is None):
-    parser.error("Please provide an Id")
-    parser.print_help()
-    exit(-1)
-if(opts.range_min and opts.range_max and opts.range_min > opts.range_max):
-    print("wrong chapter range !!!")
-    exit(-1)
-if(opts.language is None):
-    ###Because english good 
-    opts.language = "English"
 
-def getFromApi(listId):
+def getFromApi(mangaName, listId):
     for id in listId:
         r = requests.get("https://mangadex.org/api/?id=" + id  +"&server=null&saver=1&type=chapter", None)
         jason = json.loads(r.text)
@@ -58,7 +48,7 @@ def getFromApi(listId):
             with open(mangaName + "/" + volume +"/chapter_" + chapter + "/" + file, 'wb') as f:
                 f.write(r.content)
 
-def getListId(webpageHtml, begin , end, languageRequire):
+def getListId(mangaName, webpageHtml, begin , end, languageRequire):
     listId = []
     listChapter = []
     fid=urllib.request.urlopen(webpageHtml)
@@ -88,21 +78,36 @@ def getListId(webpageHtml, begin , end, languageRequire):
             else:
                 listChapter.append(chapter)
                 listId.append(href)
-    getFromApi(listId)
+    getFromApi(mangaName, listId)
 
-fid=urllib.request.urlopen('https://mangadex.org/manga/' + str(opts.id))
-webpage=fid.read().decode('utf-8')
-soup = BeautifulSoup(webpage,features="html.parser")
-mangaName = soup.findAll("span",{"class":"mx-1"})[0].text
+def main():
+    if(opts.id is None):
+        parser.error("Please provide an Id")
+        parser.print_help()
+        exit(-1)
+    if(opts.range_min and opts.range_max and opts.range_min > opts.range_max):
+        print("wrong chapter range !!!")
+        exit(-1)
+    if(opts.language is None):
+        ###Because english good 
+        opts.language = "English"
 
-listChapters = soup.findAll("li",{"class":"page-item paging"})
-if not listChapters:
-    getListId("https://mangadex.org/manga/" + str(opts.id), opts.range_min, opts.range_max, opts.language)
-else:
-    html = listChapters[0]
-    href = [i.findAll('a', href=True) for i in soup.findAll("li",{"class":"page-item paging"})][0][0]["href"]
-    mangaRaw = href.split('/')[2]
-    maxChapter = href.split('/')[5]
-    for x in range(int(maxChapter),0,-1):
-        print("Downloading on https://mangadex.org/title/" + str(opts.id) + "/" + mangaRaw + "/chapters/" + str(x))
-        getListId("https://mangadex.org/title/" + str(opts.id) + "/" + mangaRaw + "/chapters/" + str(x), opts.range_min, opts.range_max,opts.language)
+    fid=urllib.request.urlopen('https://mangadex.org/manga/' + str(opts.id))
+    webpage=fid.read().decode('utf-8')
+    soup = BeautifulSoup(webpage,features="html.parser")
+    mangaName = soup.findAll("span",{"class":"mx-1"})[0].text
+
+    listChapters = soup.findAll("li",{"class":"page-item paging"})
+    if not listChapters:
+        getListId(mangaName, "https://mangadex.org/manga/" + str(opts.id), opts.range_min, opts.range_max, opts.language)
+    else:
+        html = listChapters[0]
+        href = [i.findAll('a', href=True) for i in soup.findAll("li",{"class":"page-item paging"})][0][0]["href"]
+        mangaRaw = href.split('/')[2]
+        maxChapter = href.split('/')[5]
+        for x in range(int(maxChapter),0,-1):
+            print("Downloading on https://mangadex.org/title/" + str(opts.id) + "/" + mangaRaw + "/chapters/" + str(x))
+            getListId(mangaName, "https://mangadex.org/title/" + str(opts.id) + "/" + mangaRaw + "/chapters/" + str(x), opts.range_min, opts.range_max,opts.language)
+
+if (__name__ == "__main__"):
+    main()
