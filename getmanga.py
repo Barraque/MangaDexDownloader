@@ -16,22 +16,23 @@ parser = OptionParser()
 parser.add_option("-i","--id",type="int", help="the id of the mangaDex manga")
 parser.add_option("-b","--range_min",type="int", help="Begining of the chapter to download (an int)")
 parser.add_option("-e","--range_max",type="int", help="End of the chapter to download (an int)")
+parser.add_option("-p","--path",type="str",metavar="FILE", help="path of the future directory")
 parser.add_option("-l","--language", help="language of the scan", type="choice", choices=["Arabic","Bengali","Bulgarian","Burmese","Catalan","Chinese (Simp)","Chinese (Trad)","Czech","Danish","Dutch","English","Filipino","Finnish","French","German","Greek","Hebrew","Hindi","Hungarian","Indonesian","Italian","Japanese","Korean","Lithuanian","Malay","Mongolian","Norwegian","Other","Persian","Polish","Portuguese (Br)","Portuguese (Pt)","Romanian","Russian","Serbo-Croatian","Spanish (Es)","Spanish (LATAM)","Swedish","Thai","Turkish","Ukrainian","Vietnamese","Other"])
 parser.add_option("-L","--show_language",action="callback", callback=show_language, help="show the list of languages that works on MangaDex")
 
 (opts, args) = parser.parse_args()
 
 
-def getFromApi(mangaName, listId):
+def getFromApi(mangaName, listId, path):
     for id in listId:
         r = requests.get("https://mangadex.org/api/?id=" + id  +"&server=null&saver=1&type=chapter", None)
         jason = json.loads(r.text)
         volume = jason["volume"]
         chapter = jason['chapter']
-        if not os.path.exists(mangaName + "/" + volume):
-            os.makedirs(mangaName + "/" + volume)
-        if not os.path.exists(mangaName +"/"+ volume +"/chapter_" + chapter):
-            os.makedirs(mangaName +"/"+ volume +"/chapter_" + chapter)
+        if not os.path.exists(path + mangaName + "/" + volume):
+            os.makedirs(path + mangaName + "/" + volume)
+        if not os.path.exists(path + mangaName +"/"+ volume +"/chapter_" + chapter):
+            os.makedirs(path + mangaName +"/"+ volume +"/chapter_" + chapter)
         url = jason['server'] + jason['hash'] 
         index = 0
         print("Saving volume " + volume +".chapter " + chapter + " of " + mangaName);
@@ -39,16 +40,16 @@ def getFromApi(mangaName, listId):
         maxNumber = len(jason['page_array'])
         for file in jason['page_array']:
             number += 1 
-            if os.path.exists(mangaName + "/" + volume +"/chapter_" + chapter + "/" + file):
+            if os.path.exists(path + mangaName + "/" + volume +"/chapter_" + chapter + "/" + file):
                 print("Already having " + mangaName + "/" + volume +"/chapter_" + chapter+ " part " + str(number) + " of " + str(maxNumber))
                 continue
             print("\tpart " + str(number) + " of " + str(maxNumber))
             r = requests.get( url + "/" + file)
             r.raw.decode_content = True
-            with open(mangaName + "/" + volume +"/chapter_" + chapter + "/" + file, 'wb') as f:
+            with open(path + mangaName + "/" + volume +"/chapter_" + chapter + "/" + file, 'wb') as f:
                 f.write(r.content)
 
-def getListId(mangaName, webpageHtml, begin , end, languageRequire):
+def getListId(mangaName, webpageHtml, begin , end, languageRequire, path):
     listId = []
     listChapter = []
     fid=urllib.request.urlopen(webpageHtml)
@@ -78,13 +79,15 @@ def getListId(mangaName, webpageHtml, begin , end, languageRequire):
             else:
                 listChapter.append(chapter)
                 listId.append(href)
-    getFromApi(mangaName, listId)
+    getFromApi(mangaName, listId, path)
 
 def main():
     if(opts.id is None):
         parser.error("Please provide an Id")
         parser.print_help()
         exit(-1)
+    if(opts.path is None):
+        opts.path = "./"
     if(opts.range_min and opts.range_max and opts.range_min > opts.range_max):
         print("wrong chapter range !!!")
         exit(-1)
@@ -106,8 +109,8 @@ def main():
         mangaRaw = href.split('/')[2]
         maxChapter = href.split('/')[5]
         for x in range(int(maxChapter),0,-1):
-            print("Downloading on https://mangadex.org/title/" + str(opts.id) + "/" + mangaRaw + "/chapters/" + str(x))
-            getListId(mangaName, "https://mangadex.org/title/" + str(opts.id) + "/" + mangaRaw + "/chapters/" + str(x), opts.range_min, opts.range_max,opts.language)
+            print("Downloading on https://mangadex.org/title/" + str(opts.id) + "/" + mangaRaw + "/chapters/" + str(x), opts.path)
+            getListId(mangaName, "https://mangadex.org/title/" + str(opts.id) + "/" + mangaRaw + "/chapters/" + str(x), opts.range_min, opts.range_max,opts.language, opts.path)
 
 if (__name__ == "__main__"):
     main()
