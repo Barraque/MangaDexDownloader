@@ -4,6 +4,7 @@ import requests ,json, sys, re, os, shutil
 from bs4 import BeautifulSoup
 from optparse import OptionParser
 import urllib.request
+import tool as tool
 
 class SkipChapter(Exception): pass
 class StopHere(Exception): pass
@@ -35,15 +36,14 @@ def getFromApi(mangaName, listId, path):
             os.makedirs(path + mangaName +"/"+ volume +"/chapter_" + chapter)
         url = jason['server'] + jason['hash'] 
         index = 0
-        print("Saving volume " + volume +".chapter " + chapter + " of " + mangaName);
         number = 0
         maxNumber = len(jason['page_array'])
+        bar = tool.Progress("Vol." +volume +" Ch." + chapter + " of " + mangaName,maxNumber)
         for file in jason['page_array']:
             number += 1 
             if os.path.exists(path + mangaName + "/" + volume +"/chapter_" + chapter + "/" + file):
-                print("Already having " + mangaName + "/" + volume +"/chapter_" + chapter+ " part " + str(number) + " of " + str(maxNumber))
                 continue
-            print("\tpart " + str(number) + " of " + str(maxNumber))
+            bar.add()
             r = requests.get( url + "/" + file)
             r.raw.decode_content = True
             with open(path + mangaName + "/" + volume +"/chapter_" + chapter + "/" + file, 'wb') as f:
