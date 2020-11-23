@@ -7,7 +7,7 @@ MangaDexDownloader is a tiny program that download your favorite scan from the t
 Use the setup.sy to install the different dependencies.
 
 ```bash
-# pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ## Usage
