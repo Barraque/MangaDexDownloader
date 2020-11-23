@@ -24,10 +24,6 @@ setup(
             "Programming Language :: Python :: 3 :: Only",
             ],
         packages=["getmanga.py"],
-        install_requires=[
-            "bs4>=0.0.1",
-            "optparse-pretty>=0.1.1",
-            ],
         entry_points={
             "console_scripts": [ "getmanga = getmanga:main"]
             }
